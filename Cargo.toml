@@ -37,6 +37,7 @@ oggvorbismeta = "0.1"
 sanitize-filename = "0.5.0"
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.20", features = ["fs"] }
+stderrlog = "0.6.0"
 
 [package.metadata.winres]
 OriginalFilename = "DownOnSpot.exe"
