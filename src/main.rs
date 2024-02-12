@@ -19,17 +19,6 @@ use std::time::{Duration, Instant};
 #[cfg(not(windows))]
 #[tokio::main]
 async fn main() {
-	match env::var("RUST_LOG") {
-		Ok(v) => {
-			if v == "DEBUG" {
-				stderrlog::new().module(module_path!()).verbosity(stderrlog::LogLevelNum::Debug).init().unwrap();
-			}
-		},
-		Err(_) => {
-			// noop - don't init logger
-		}
-	}
-	
 	start().await;
 }
 
@@ -44,6 +33,7 @@ async fn main() {
 }
 
 async fn start() {
+	env_logger::init();
 	let settings = match Settings::load().await {
 		Ok(settings) => {
 			println!(
