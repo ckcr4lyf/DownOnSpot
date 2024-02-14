@@ -1,6 +1,7 @@
 use chrono::{Datelike, NaiveDate};
 use oggvorbismeta::{read_comment_header, replace_comment_header, CommentHeader, VorbisComments};
 use std::fs::File;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use super::Field;
@@ -42,6 +43,24 @@ impl super::Tag for OggTag {
 
 	fn add_cover(&mut self, _mime: &str, _data: Vec<u8>) {
 		error!("ALBUM ART IN OGG NOT SUPPORTED!");
+		match self.path.parent() {
+			Some(p) => {
+				let cp = PathBuf::from(p).join("cover.jpg");
+				match File::create(cp) {
+					Ok(mut file) => {
+						file.write_all(&_data);
+						file.flush();
+						info!("saved album art to file");
+					},
+					Err(e) => {
+						error!("Failed to open file {}", e);
+					}
+				}				
+			},
+			None => {
+				warn!("no parent path")
+			}
+		}
 	}
 
 	fn set_raw(&mut self, tag: &str, value: Vec<String>) {

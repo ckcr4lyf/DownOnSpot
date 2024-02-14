@@ -382,7 +382,10 @@ impl DownloaderInternal {
 		let mut cover = None;
 		if let Some(image) = track.album.images.first() {
 			match DownloaderInternal::download_cover(&image.url).await {
-				Ok(c) => cover = Some(c),
+				Ok(c) => {
+					debug!("Going to download cover");
+					cover = Some(c)
+				}
 				Err(e) => warn!("Failed downloading cover! {}", e),
 			}
 		}
@@ -491,11 +494,13 @@ impl DownloaderInternal {
 		tx: Sender<Message>,
 		job_id: i64,
 	) -> Result<(PathBuf, AudioFormat), SpotifyError> {
+		debug!("Going to download {}", id);
 		let id = SpotifyId::from_base62(id)?;
 		let mut track = Track::get(session, id).await?;
 
 		// Fallback if unavailable
 		if !track.available {
+			warn!("Track unavailable! Will try and find alternatives");
 			track = DownloaderInternal::find_alternative(session, track).await?;
 		}
 
